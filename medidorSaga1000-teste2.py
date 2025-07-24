@@ -1,5 +1,6 @@
 import struct
 import socket
+import time
 
 ENQ = 0x05
 ACK = 0x06
@@ -10,7 +11,7 @@ ALO = 0xFF
 MAX_NAKS = 7
 MAX_WAITS = 12
 MAX_RETRIES = 7
-MAX_ALO = 5  # máximo ALO enviados antes de desistir
+MAX_ALO = 5
 
 def calcula_crc16(data: bytes):
     crc = 0xFFFF
@@ -42,8 +43,7 @@ def montar_comando_14(numero_serie: int):
     crc_bytes = struct.pack('>H', crc)
     dados_completos = dados + crc_bytes
     dados_complementados = complementar_bytes(dados_completos)
-    mensagem = dados_complementados
-    return mensagem
+    return dados_complementados
 
 def validar_crc_resposta(resposta: bytes):
     if len(resposta) < 3:
@@ -62,7 +62,7 @@ def float24_to_float32(b1, b2, b3):
     raw = bytes([0x00, b1, b2, b3])
     return struct.unpack('<f', raw)[0]
 
-def esperar_enq(sock, timeout=10):
+def esperar_enq(sock, timeout=20):
     sock.settimeout(timeout)
     try:
         while True:
@@ -78,17 +78,30 @@ def enviar_alo(sock):
     for _ in range(MAX_ALO):
         sock.sendall(bytes([ALO]))
 
+def enviar_pacote_udp_ativacao(ip_destino, num_tentativas=3, intervalo=1.0):
+    print(f"\n📡 Enviando {num_tentativas} pacotes UDP de ativação para {ip_destino}:65535")
+    mensagem = bytes.fromhex("020121c03803")
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_sock:
+        for i in range(num_tentativas):
+            try:
+                udp_sock.sendto(mensagem, (ip_destino, 65535))
+                print(f"🔸 Pacote UDP {i+1}/{num_tentativas} enviado.")
+                time.sleep(intervalo)
+            except Exception as e:
+                print(f"⚠️ Erro ao enviar UDP: {e}")
+
 def enviar_comando(sock, mensagem):
     nak_count = 0
     wait_count = 0
     retries = 0
+    ip_destino = sock.getpeername()[0]
 
     while retries < MAX_RETRIES:
         print("Enviando ALO para iniciar conexão...")
         enviar_alo(sock)
 
         print("Aguardando ENQ do medidor para enviar comando...")
-        if not esperar_enq(sock, timeout=10):
+        if not esperar_enq(sock, timeout=20):
             print("Timeout aguardando ENQ. Comando não enviado.")
             retries += 1
             continue
@@ -96,13 +109,20 @@ def enviar_comando(sock, mensagem):
         print("ENQ recebido, enviando comando.")
         sock.sendall(mensagem)
 
-        resposta = sock.recv(512)
+        try:
+            resposta = sock.recv(512)
+        except socket.timeout:
+            print("⏱️ Timeout ao receber resposta.")
+            retries += 1
+            continue
+
         if not resposta:
             print("Nenhuma resposta recebida.")
             retries += 1
             continue
 
-        resposta_complementada = complementar_bytes(resposta)
+        # ⚠️ REMOVIDO complemento extra
+        resposta_complementada = resposta
 
         print(f"Resposta recebida (hex): {resposta_complementada.hex().upper()}")
         primeiro_byte = resposta_complementada[0]
@@ -143,6 +163,10 @@ def enviar_comando(sock, mensagem):
                 if nak_count > MAX_NAKS:
                     print("Número máximo de NAKs atingido. Abortando.")
                     break
+
+                # ⚠️ NOVO: reenviar pacotes UDP após erro
+                print("🔄 Reenviando pacotes de ativação UDP antes de nova tentativa.")
+                enviar_pacote_udp_ativacao(ip_destino)
                 continue
 
         retries += 1
@@ -191,6 +215,9 @@ def main():
         print(f"\nExecutando comando {comando} para medidor {ip}:{porta}")
 
         try:
+            # Etapa de ativação inicial
+            enviar_pacote_udp_ativacao(ip)
+
             with socket.create_connection((ip, porta), timeout=5) as sock:
                 print("Conectado ao medidor.")
 
@@ -202,7 +229,7 @@ def main():
                 resposta = enviar_comando(sock, mensagem)
                 if resposta:
                     print("✅ Resposta válida recebida!")
-                    interpretar_float24_em_bloco(resposta[1:-2])  # Ignora código e CRC para processar dados
+                    interpretar_float24_em_bloco(resposta[1:-2])
                 else:
                     print("❌ Falha na comunicação ou resposta inválida.")
 
