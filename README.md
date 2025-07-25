@@ -145,6 +145,12 @@
 
         Float24 interpretado
 ```
+
+## 📑 Documentação 
+### [📄 Protocolo ABNT NBR 14522 (PDF)](docs/NormasAbntNbr14522.pdf)
+### [📘 Manual do Medidor Saga 1000](docs/SAGA1000.pdf)
+### [📘 Manual do Gatway BlackBox RS-232](docs/manualRS232.pdf)
+
 # 🛠️ Contribuindo
 ### Contribuições são bem-vindas!
 
