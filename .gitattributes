@@ -1,0 +1,30 @@
+# Define o padrão de fim de linha para LF (Unix-like)
+* text=auto eol=lf
+
+# Arquivos Python sempre tratados como texto
+*.py text
+
+# Arquivos de configuração e scripts
+*.sh text eol=lf
+*.env text
+*.txt text
+*.md text
+*.json text
+*.yml text
+*.yaml text
+*.toml text
+
+# Ignore diffs de arquivos binários
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.pkl binary
+
+# Evita conflitos em notebooks Jupyter (se você usar)
+*.ipynb merge=jupyternotebook

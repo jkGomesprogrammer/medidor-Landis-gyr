@@ -1,0 +1,47 @@
+# Ambiente virtual (virtualenv)
+venv/
+env/
+.venv/
+
+# Bytecode Python compilado
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pastas/arquivos criados por editores
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Arquivos de log
+*.log
+
+# Arquivos de configuração locais (exemplo: para ambientes)
+*.env
+.env.*
+
+# Diretórios de build, distribuição e cache
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Arquivos temporários
+*.swp
+*.tmp
+*.bak
+
+# Testes e caches de testes
+.pytest_cache/
+.cache/
+
+# Arquivos do Jupyter Notebook checkpoint
+.ipynb_checkpoints/
+
+# Arquivos do sistema operacional (macOS, Windows, Linux)
+.DS_Store
+Thumbs.db
+
+# Pacotes instalados por pip (se você os colocar na pasta do projeto)
+pip-wheel-metadata/
