@@ -3,7 +3,8 @@
 > **⚠️ ATENÇÃO:**  
 > Este código **não está finalizado** e apresenta erros de conexão devido a respostas incorretas que não conferem com os cálculos.  
 > Portanto, **NÃO DEVE SER USADO EM PRODUÇÃO**.
-Comunicação TCP com Medidor via Gateway
+
+# Comunicação TCP com Medidor via Gateway
 Este script Python realiza comunicação TCP com um medidor usando protocolo ABNT, enviando comandos formatados com CRC e recebendo a resposta. As configurações de IP, porta e parâmetros do comando são carregadas de um arquivo .env.
 
 # 📋 Descrição
