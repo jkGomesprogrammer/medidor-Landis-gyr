@@ -4,8 +4,6 @@
 > Este código **não está finalizado** e apresenta erros de conexão devido a respostas incorretas que não conferem com os cálculos.  
 > Portanto, **NÃO DEVE SER USADO EM PRODUÇÃO**.
 
-Este script Python realiza comunicação TCP com um medidor usando protocolo ABNT, enviando comandos formatados com CRC e recebendo a resposta. As configurações de IP, porta e parâmetros do comando são carregadas de um arquivo .env.
-
 # 📋 Descrição
     Este script Python realiza comunicação TCP com um medidor Saga 1000 via gateway, usando o protocolo ABNT NBR 14522. 
     Ele monta comandos com CRC conforme o protocolo, envia via TCP e recebe as respostas, exibindo-as em formato hexadecimal.
